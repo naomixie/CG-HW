@@ -16,17 +16,20 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-// settings
+// settings 屏幕大小
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// camera
-Camera camera(glm::vec3(0.0f, 0.0f, 15.0f));
+// camera 摄像机位置
+Camera camera(glm::vec3(0.0f, -5.0f, 15.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
+float radius = 10.0f;                  //Initial radius for camera rotation
+const float nearest_distance = 5.0f;   //Nearest distance for camera rotation
+const float furthest_distance = 20.0f; //Furthest distance for camera rotation
 
-// timing
+// timing 记录帧与帧之间的时间差
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -58,11 +61,13 @@ int main()
     glfwMakeContextCurrent(window);
     // 注册这个函数，告诉GLFW我们希望每当窗口调整大小的时候调用这个函数
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
+    // 当鼠标移动时调用这个函数
+    // glfwSetCursorPosCallback(window, mouse_callback);
+    // 当鼠标Scroll的时候调用这个函数
+    // glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers 初始化GLAD
     // ---------------------------------------
@@ -99,7 +104,7 @@ int main()
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
+        deltaTime = currentFrame - lastFrame; // 两个帧之间的时间差
         lastFrame = currentFrame;
 
         // input
@@ -109,6 +114,7 @@ int main()
         // render
         // ------
         // 设置清空屏幕所用的颜色
+        // IMP：这里修改背景颜色
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         // 清空屏幕
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -116,9 +122,15 @@ int main()
         // don't forget to enable shader before setting uniforms
         ourShader.use();
 
+        // 让camera旋转
+        glm::mat4 view = glm::mat4(10.0f); // make sure to initialize matrix to identity matrix first
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 10.0, 0.0));
+
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
+        // view = camera.GetViewMatrix();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
@@ -156,13 +168,21 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
     //TODO
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+    // camera.ProcessKeyboard(FORWARD, deltaTime);
+    {
+        radius = (radius <= nearest_distance) ? nearest_distance : radius;
+        radius -= deltaTime;
+    }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+    // camera.ProcessKeyboard(BACKWARD, deltaTime);
+    {
+        radius = (radius >= furthest_distance) ? furthest_distance : radius;
+        radius += deltaTime;
+    }
+    // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(LEFT, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
