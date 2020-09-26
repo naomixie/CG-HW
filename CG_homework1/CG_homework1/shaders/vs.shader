@@ -4,6 +4,8 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
 out vec4 vPos;                                  //输出变量，包含4个float分量的默认向量
+out vec3 Normal; //Normal vectors
+out vec3 FragPos;   //Actual Fragment's position   
 
 uniform mat4 model;
 uniform mat4 view;
@@ -17,4 +19,6 @@ void main()
     //它在幕后是vec4类型的。在main函数的最后，我们将gl_Position设置的值会成为该顶点着色器的输出。
     gl_Position = projection * view * model * vec4(aPos, 1.0);
     vPos= gl_Position;
+    FragPos = vec3(model * vec4(aPos,1.0));
+    Normal = aNormal;
 }
