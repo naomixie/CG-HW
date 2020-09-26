@@ -1,0 +1,5 @@
+build/
+External/
+include/
+out/
+.vs
