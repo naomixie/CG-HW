@@ -15,6 +15,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+void updateLight();
+float calColor(float base, float range, float curVal);
 
 // settings 屏幕大小
 const unsigned int SCR_WIDTH = 800;
@@ -27,14 +29,19 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 float radius = 10.0f;                  //Initial radius for camera rotation
 const float nearest_distance = 5.0f;   //Nearest distance for camera rotation
-const float furthest_distance = 20.0f; //Furthest distance for camera rotation
+const float furthest_distance = 25.0f; //Furthest distance for camera rotation
+const float move_velocity = 3.0f;      // speed of camera movement
 
 // timing 记录帧与帧之间的时间差
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // Lighting Position
-glm::vec3 lightPos(10.2f, 10.0f, 10.0f);
+float const light_radius = 8.0f;                                                          // radius of light_object on the y = 5.0f coplanar
+float const light_velocity = 2.0f;                                                        // velocity of light_object
+float light_angle = 0.0f;                                                                 // angle of light and axis
+glm::vec3 lightPos(light_radius *sin(light_angle), 5.0f, light_radius *cos(light_angle)); // initial position(r,5,0)
+glm::vec3 lightColor(0.0f, 0.0f, 0.0f);                                                   // Record the RGB of the light
 
 int main()
 {
@@ -158,6 +165,10 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
+    float const green_value = 150.0f / 255.0f;
+    float red_value = 1.0f;  //Initial Value Equals
+    float blue_value = 0.0f; //Initial Value Equals 0
+
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -172,32 +183,35 @@ int main()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame; // 两个帧之间的时间差
         lastFrame = currentFrame;
+        // printf("deltaFrame = %f \n", deltaTime);
 
         // input
         // -----
         processInput(window);
+        updateLight();
 
         // render
         // ------
         // 设置清空屏幕所用的颜色
         // IMP：这里修改背景颜色
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor((150.0f / 255.0f + cos(currentFrame) / 5) / 2 + cos(lightColor.x) / 2, green_value / 2 + cos(lightColor.y) / 2, (150.0f / 255.0f + sin(currentFrame) / 5) / 2 + (185.0f / 255.0f + cos(lightColor.z) / 3.63f) / 2, 0.6f);
         // 清空屏幕
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 让camera旋转
         glm::mat4 view = glm::mat4(10.0f); // make sure to initialize matrix to identity matrix first
-        // float camX = sin(glfwGetTime()) * radius;
-        // float camZ = cos(glfwGetTime()) * radius;
-        // view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 10.0, 0.0));
         camera.RotateOnObject(radius);
         view = camera.GetViewMatrixR(glm::vec3(0.0, 2.0, 0.0)); // Set Center of Model is 2.0 instead of 0.0
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
+
         // Set Object Color
-        ourShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        ourShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        red_value = 150.0f / 255.0f + cos(currentFrame) / 5;
+        blue_value = 150.0f / 255.0f + sin(currentFrame) / 5;
+
+        ourShader.setVec3("objectColor", red_value, green_value, blue_value);
+        ourShader.setVec3("lightColor", cos(lightColor.x), cos(lightColor.y), cos(lightColor.z));
         ourShader.setVec3("lightPos", lightPos);
         ourShader.setVec3("viewPos", camera.Position);
         // view/projection transformations
@@ -212,9 +226,10 @@ int main()
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
-        // also draw the lamp object
+        // draw the lamp object
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setVec3("lightCubeColor", cos(lightColor.x), cos(lightColor.y), 185.0f / 255.0f + cos(lightColor.z) / 3.63f);
         lightCubeShader.setMat4("view", view);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
@@ -259,18 +274,41 @@ void processInput(GLFWwindow *window)
     // camera.ProcessKeyboard(FORWARD, deltaTime);
     {
         radius = (radius <= nearest_distance) ? nearest_distance : radius;
-        radius -= deltaTime;
+        radius -= deltaTime * move_velocity;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     // camera.ProcessKeyboard(BACKWARD, deltaTime);
     {
         radius = (radius >= furthest_distance) ? furthest_distance : radius;
-        radius += deltaTime;
+        radius += deltaTime * move_velocity;
     }
-    // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    //     camera.ProcessKeyboard(LEFT, deltaTime);
-    // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    //     camera.ProcessKeyboard(RIGHT, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        light_angle -= deltaTime * light_velocity;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        light_angle += deltaTime * light_velocity;
+
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+        lightColor.z -= deltaTime;
+    // if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+    //     lightColor.y += deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+        lightColor.z += deltaTime;
+}
+
+void updateLight()
+{
+    lightPos.x = light_radius * sin(light_angle);
+    lightPos.z = light_radius * cos(light_angle);
+}
+
+float calColor(float base, float range, float curVal)
+{
+    float baseVal = base / 255.0f;
+    // range / 255.0f = 1.0f / x => x = 1 / range * 255.0f
+    float rangeDiv = 1.0f / range * 255.0f;
+    // rangeVal = cos(curVal)/rangeDiv
+    return cos(curVal) / rangeDiv;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
