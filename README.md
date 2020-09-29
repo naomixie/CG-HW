@@ -129,6 +129,7 @@ Specular Lighting 指的是灯光在反射性较强的物体上反射所呈现�
 这样的实现方式还有一个优点便是能够在跟茶壶颜色实现统一的情况下又能一定程度的呈现灯光颜色的变化，有一种灯光不仅仅是打在物体上，也大在背景上了的感觉。
 
 打光后：
+
 ![r5](https://github.com/naomixie/CG-HW/blob/HW1/CG_homework1/CG_homework1/pics/r5.PNG)
 
 打光前：
