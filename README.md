@@ -83,7 +83,7 @@ Specular Lighting 指的是灯光在反射性较强的物体上反射所呈现�
 
 而由于即使是暖光也是有一定的限制的（再多了呈现效果不佳），我选择将其限制在（蓝色）130 至 255 之间：
 
-![r2](https://github.com/naomixie/CG-HW/tree/HW1/CG_homework1/CG_homework1/pics/r2.PNG)
+![r2](https://github.com/naomixie/CG-HW/blob/HW1/CG_homework1/CG_homework1/pics/r2.PNG)
 
 算法为：
 
@@ -103,11 +103,11 @@ Specular Lighting 指的是灯光在反射性较强的物体上反射所呈现�
 
 限制区域显示颜色的算法与打光颜色的限制是一样的，唯一不同的是对红色取了余弦值，蓝色取了正弦值，导致两种颜色之间相差了限制区域的一半。基值都是 150，但是红色取 cos，初始时 cos（0）= 1， 即 red*value 在初始时取得是 150 + 1 * 50 = 200。而 blue*value = 150 + 0 * 50 = 150。
 
-![r3](https://github.com/naomixie/CG-HW/tree/HW1/CG_homework1/CG_homework1/pics/r3.PNG)
+![r3](https://github.com/naomixie/CG-HW/blob/HW1/CG_homework1/CG_homework1/pics/r3.PNG)
 
 其次由于打光的颜色有变化，我们可以结合颜色的呈现与光的颜色关系，知道物体呈现的颜色与其所吸收到的光的颜色有关。物体在我们的视觉上所呈现的颜色是灯源的各种颜色的灯被物体吸收后所剩下的颜色的反射光的颜色。
 
-![r4](https://github.com/naomixie/CG-HW/tree/HW1/CG_homework1/CG_homework1/pics/r4.PNG)
+![r4](https://github.com/naomixie/CG-HW/blob/HW1/CG_homework1/CG_homework1/pics/r4.PNG)
 
 在本次作业中也实现了这一效果，我们可以看到物体所呈现的颜色会随着灯光颜色的变化而变化。
 
@@ -129,10 +129,10 @@ Specular Lighting 指的是灯光在反射性较强的物体上反射所呈现�
 这样的实现方式还有一个优点便是能够在跟茶壶颜色实现统一的情况下又能一定程度的呈现灯光颜色的变化，有一种灯光不仅仅是打在物体上，也大在背景上了的感觉。
 
 打光后：
-![r5](https://github.com/naomixie/CG-HW/tree/HW1/CG_homework1/CG_homework1/pics/r5.PNG)
+![r5](https://github.com/naomixie/CG-HW/blob/HW1/CG_homework1/CG_homework1/pics/r5.PNG)
 
 打光前：
 
-![r6](https://github.com/naomixie/CG-HW/tree/HW1/CG_homework1/CG_homework1/pics/r6.PNG)
+![r6](https://github.com/naomixie/CG-HW/blob/HW1/CG_homework1/CG_homework1/pics/r6.PNG)
 
 总体上来说在加入灯光这一因素过后物体和背景的颜色呈现（灯光颜色都参与在了其中）更加的丰富了起来，也使得物体更加立体化，与背景能够很清楚的区分开来。
