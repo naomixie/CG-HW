@@ -5,7 +5,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+//#include <fstream>
 #include <iostream>
+#include <stdio.h>
+
 
 #include "include/shader.h"
 #include "include/camera.h"
@@ -22,26 +25,33 @@ float calColor(float base, float range, float curVal);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// camera 摄像机位置
-Camera camera(glm::vec3(0.0f, 0.0f, 15.0f), glm::vec3(0.0, 10.0, 0.0));
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
-float radius = 10.0f;                  //Initial radius for camera rotation
-const float nearest_distance = 5.0f;   //Nearest distance for camera rotation
-const float furthest_distance = 25.0f; //Furthest distance for camera rotation
-const float move_velocity = 3.0f;      // speed of camera movement
+//// camera 摄像机位置
+//Camera camera(glm::vec3(0.0f, 0.0f, 15.0f), glm::vec3(0.0, 10.0, 0.0));
+//float lastX = SCR_WIDTH / 2.0f;
+//float lastY = SCR_HEIGHT / 2.0f;
+//bool firstMouse = true;
+//float radius = 10.0f;                  //Initial radius for camera rotation
+//const float nearest_distance = 5.0f;   //Nearest distance for camera rotation
+//const float furthest_distance = 25.0f; //Furthest distance for camera rotation
+//const float move_velocity = 3.0f;      // speed of camera movement
 
 // timing 记录帧与帧之间的时间差
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+// float deltaTime = 0.0f;
+// float lastFrame = 0.0f;
 
-// Lighting Position
-float const light_radius = 8.0f;                                                          // radius of light_object on the y = 5.0f coplanar
-float const light_velocity = 2.0f;                                                        // velocity of light_object
-float light_angle = 0.0f;                                                                 // angle of light and axis
-glm::vec3 lightPos(light_radius *sin(light_angle), 5.0f, light_radius *cos(light_angle)); // initial position(r,5,0)
-glm::vec3 lightColor(0.0f, 0.0f, 0.0f);                                                   // Record the RGB of the light
+// // Lighting Position
+// float const light_radius = 8.0f;                                                          // radius of light_object on the y = 5.0f coplanar
+// float const light_velocity = 2.0f;                                                        // velocity of light_object
+// float light_angle = 0.0f;                                                                 // angle of light and axis
+// glm::vec3 lightPos(light_radius *sin(light_angle), 5.0f, light_radius *cos(light_angle)); // initial position(r,5,0)
+// glm::vec3 lightColor(0.0f, 0.0f, 0.0f);                                                   // Record the RGB of the light
+
+//class FileRead {
+//    public ifstream myfile("../resources/overlapping.txt");
+//
+//
+//};
+
 
 int main()
 {
@@ -60,7 +70,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Homework1 Teapot Naomi", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Homework2 Naomi", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -78,6 +88,47 @@ int main()
 
     // tell GLFW to capture our mouse
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    cout << "DEBUGGING" << endl;
+
+    //ifstream myfile("../resources/overlapping.txt");
+    FILE* mFile = fopen("../resources/overlapping.txt","r");
+    string temp;
+    char readline[100];
+    float vertices[72];
+    //int vertices[73];
+    if (mFile == NULL) perror("Error opening file");
+    else
+    {
+        int count = 0;
+        while (!feof(mFile))
+        {
+            fscanf(mFile, "%f %f %f ",&vertices[count], &vertices[count+1], &vertices[count+2]);   //Vertex 1 for triangle
+            fscanf(mFile, "%f %f %f ", &vertices[count+6], &vertices[count + 7], &vertices[count + 8]);   //Vertex 2 for triangle
+            fscanf(mFile, "%f %f %f ", &vertices[count+12], &vertices[count + 13], &vertices[count + 14]);   //Vertex 3 for triangle
+            fscanf(mFile, "%f %f %f ", &vertices[count+3], &vertices[count + 4], &vertices[count + 5]);   // Color for vertex 1
+            fscanf(mFile, "%f %f %f ", &vertices[count + 9], &vertices[count + 10], &vertices[count + 11]);   //Vertex 2 for triangle
+            fscanf(mFile, "%f %f %f\n", &vertices[count + 15], &vertices[count + 16], &vertices[count + 17]);   //Vertex 3 for triangle
+            count += 18;
+            //fscanf(mFile, "%i %i %i ", &vertices[count], &vertices[count + 1], &vertices[count + 2]);   //Vertex 1 for triangle
+            //fscanf(mFile, "%i %i %i ", &vertices[count + 6], &vertices[count + 7], &vertices[count + 8]);   //Vertex 2 for triangle
+            //fscanf(mFile, "%i %i %i ", &vertices[count + 12], &vertices[count + 13], &vertices[count + 14]);   //Vertex 3 for triangle
+            //fscanf(mFile, "%i %i %i ", &vertices[count + 3], &vertices[count + 4], &vertices[count + 5]);   // Color for vertex 1
+            //fscanf(mFile, "%i %i %i ", &vertices[count + 9], &vertices[count + 10], &vertices[count + 11]);   //Vertex 2 for triangle
+            //fscanf(mFile, "%i %i %i\n", &vertices[count + 15], &vertices[count + 16], &vertices[count + 17]);   //Vertex 3 for triangle
+            //count += 18;
+            //fscanf(mFile, "%i ", &count);
+            //cout << count << endl;
+            /*char buffer[100];
+            fgets(buffer,100,mFile);
+            fputs(buffer, stdout);*/
+        }
+        fclose(mFile);
+        for (int i = 0; i < 72; i++) {
+            cout << vertices[i] << "\t";
+        }
+    }
+
+    //return 0;
 
     // glad: load all OpenGL function pointers 初始化GLAD
     // ---------------------------------------
@@ -88,11 +139,11 @@ int main()
     }
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    stbi_set_flip_vertically_on_load(true);
+    // stbi_set_flip_vertically_on_load(true);
 
     // configure global opengl state
     // -----------------------------
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
 
     // build and compile shaders
     // -------------------------
@@ -101,73 +152,73 @@ int main()
 
     // load models
     // -----------
-    Model ourModel("../resources/teapot.obj");
+    // Model ourModel("../resources/teapot.obj");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+    //float vertices[] = {
+    //    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+    //    0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+    //    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+    //    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+    //    -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+    //    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
 
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
 
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+    //    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+    //    -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+    //    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+    //    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+    //    -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+    //    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
 
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    //    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    //    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+    //    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+    //    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+    //    0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    //    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+    //    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+    //    0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+    //    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+    //    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+    //    -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+    //    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
 
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
-    // first, configure the cube's VAO (and VBO)
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
+    //    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+    //    0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+    //    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+    //    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+    //    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+    //    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
+    //// first, configure the cube's VAO (and VBO)
+    //unsigned int VBO;
+    //glGenBuffers(1, &VBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-    unsigned int lightCubeVAO;
-    glGenVertexArrays(1, &lightCubeVAO);
-    glBindVertexArray(lightCubeVAO);
+    //// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+    //unsigned int lightCubeVAO;
+    //glGenVertexArrays(1, &lightCubeVAO);
+    //glBindVertexArray(lightCubeVAO);
 
-    // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //// we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    //glEnableVertexAttribArray(0);
 
-    float const green_value = 150.0f / 255.0f;
-    float red_value = 1.0f;  //Initial Value Equals
-    float blue_value = 0.0f; //Initial Value Equals 0
+    // float const green_value = 150.0f / 255.0f;
+    // float red_value = 1.0f;  //Initial Value Equals
+    // float blue_value = 0.0f; //Initial Value Equals 0
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -179,65 +230,65 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
-        // --------------------
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame; // 两个帧之间的时间差
-        lastFrame = currentFrame;
+        //// --------------------
+        //float currentFrame = glfwGetTime();
+        //deltaTime = currentFrame - lastFrame; // 两个帧之间的时间差
+        //lastFrame = currentFrame;
         // printf("deltaFrame = %f \n", deltaTime);
 
         // input
         // -----
-        processInput(window);
-        updateLight();
+        // processInput(window);
+        // updateLight();
 
         // render
         // ------
         // 设置清空屏幕所用的颜色
         // IMP：这里修改背景颜色
-        glClearColor((150.0f / 255.0f + cos(currentFrame) / 5) / 2 + cos(lightColor.x) / 2, green_value / 2 + cos(lightColor.y) / 2, (150.0f / 255.0f + sin(currentFrame) / 5) / 2 + (185.0f / 255.0f + cos(lightColor.z) / 3.63f) / 2, 0.6f);
+        // glClearColor((150.0f / 255.0f + cos(currentFrame) / 5) / 2 + cos(lightColor.x) / 2, green_value / 2 + cos(lightColor.y) / 2, (150.0f / 255.0f + sin(currentFrame) / 5) / 2 + (185.0f / 255.0f + cos(lightColor.z) / 3.63f) / 2, 0.6f);
         // 清空屏幕
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 让camera旋转
-        glm::mat4 view = glm::mat4(10.0f); // make sure to initialize matrix to identity matrix first
-        camera.RotateOnObject(radius);
-        view = camera.GetViewMatrixR(glm::vec3(0.0, 2.0, 0.0)); // Set Center of Model is 2.0 instead of 0.0
+        //// 让camera旋转
+        //glm::mat4 view = glm::mat4(10.0f); // make sure to initialize matrix to identity matrix first
+        //camera.RotateOnObject(radius);
+        //view = camera.GetViewMatrixR(glm::vec3(0.0, 2.0, 0.0)); // Set Center of Model is 2.0 instead of 0.0
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
 
         // Set Object Color
-        red_value = 150.0f / 255.0f + cos(currentFrame) / 5;
-        blue_value = 150.0f / 255.0f + sin(currentFrame) / 5;
+        //red_value = 150.0f / 255.0f + cos(currentFrame) / 5;
+        //blue_value = 150.0f / 255.0f + sin(currentFrame) / 5;
 
-        ourShader.setVec3("objectColor", red_value, green_value, blue_value);
-        ourShader.setVec3("lightColor", cos(lightColor.x), cos(lightColor.y), cos(lightColor.z));
-        ourShader.setVec3("lightPos", lightPos);
-        ourShader.setVec3("viewPos", camera.Position);
-        // view/projection transformations
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
+        //ourShader.setVec3("objectColor", red_value, green_value, blue_value);
+        //ourShader.setVec3("lightColor", cos(lightColor.x), cos(lightColor.y), cos(lightColor.z));
+        //ourShader.setVec3("lightPos", lightPos);
+        //ourShader.setVec3("viewPos", camera.Position);
+        //// view/projection transformations
+        //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        //ourShader.setMat4("projection", projection);
+        //ourShader.setMat4("view", view);
 
-        // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));     // it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model);
-        ourModel.Draw(ourShader);
+        //// render the loaded model
+        //glm::mat4 model = glm::mat4(1.0f);
+        //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        //model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));     // it's a bit too big for our scene, so scale it down
+        //ourShader.setMat4("model", model);
+        //ourModel.Draw(ourShader);
 
-        // draw the lamp object
-        lightCubeShader.use();
-        lightCubeShader.setMat4("projection", projection);
-        lightCubeShader.setVec3("lightCubeColor", cos(lightColor.x), cos(lightColor.y), 185.0f / 255.0f + cos(lightColor.z) / 3.63f);
-        lightCubeShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.8f)); // a smaller cube
-        lightCubeShader.setMat4("model", model);
+        //// draw the lamp object
+        //lightCubeShader.use();
+        //lightCubeShader.setMat4("projection", projection);
+        //lightCubeShader.setVec3("lightCubeColor", cos(lightColor.x), cos(lightColor.y), 185.0f / 255.0f + cos(lightColor.z) / 3.63f);
+        //lightCubeShader.setMat4("view", view);
+        //model = glm::mat4(1.0f);
+        //model = glm::translate(model, lightPos);
+        //model = glm::scale(model, glm::vec3(0.8f)); // a smaller cube
+        //lightCubeShader.setMat4("model", model);
 
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glBindVertexArray(lightCubeVAO);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -250,9 +301,9 @@ int main()
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &lightCubeVAO);
-    glDeleteBuffers(1, &VBO);
+    //// ------------------------------------------------------------------------
+    //glDeleteVertexArrays(1, &lightCubeVAO);
+    //glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -265,51 +316,51 @@ int main()
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 // 检测特定的键是否被按下，并在每一帧做出处理。
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    //TODO
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    // camera.ProcessKeyboard(FORWARD, deltaTime);
-    {
-        radius = (radius <= nearest_distance) ? nearest_distance : radius;
-        radius -= deltaTime * move_velocity;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    // camera.ProcessKeyboard(BACKWARD, deltaTime);
-    {
-        radius = (radius >= furthest_distance) ? furthest_distance : radius;
-        radius += deltaTime * move_velocity;
-    }
+//void processInput(GLFWwindow *window)
+//{
+//    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+//        glfwSetWindowShouldClose(window, true);
+//    //TODO
+//    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+//    // camera.ProcessKeyboard(FORWARD, deltaTime);
+//    {
+//        radius = (radius <= nearest_distance) ? nearest_distance : radius;
+//        radius -= deltaTime * move_velocity;
+//    }
+//    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+//    // camera.ProcessKeyboard(BACKWARD, deltaTime);
+//    {
+//        radius = (radius >= furthest_distance) ? furthest_distance : radius;
+//        radius += deltaTime * move_velocity;
+//    }
+//
+//    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+//        light_angle -= deltaTime * light_velocity;
+//    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+//        light_angle += deltaTime * light_velocity;
+//
+//    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+//        lightColor.z -= deltaTime;
+//    // if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+//    //     lightColor.y += deltaTime;
+//    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+//        lightColor.z += deltaTime;
+//}
+//
+//void updateLight()
+//{
+//    lightPos.x = light_radius * sin(light_angle);
+//    lightPos.z = light_radius * cos(light_angle);
+//}
 
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        light_angle -= deltaTime * light_velocity;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        light_angle += deltaTime * light_velocity;
-
-    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-        lightColor.z -= deltaTime;
-    // if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-    //     lightColor.y += deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        lightColor.z += deltaTime;
-}
-
-void updateLight()
-{
-    lightPos.x = light_radius * sin(light_angle);
-    lightPos.z = light_radius * cos(light_angle);
-}
-
-float calColor(float base, float range, float curVal)
-{
-    float baseVal = base / 255.0f;
-    // range / 255.0f = 1.0f / x => x = 1 / range * 255.0f
-    float rangeDiv = 1.0f / range * 255.0f;
-    // rangeVal = cos(curVal)/rangeDiv
-    return cos(curVal) / rangeDiv;
-}
+//float calColor(float base, float range, float curVal)
+//{
+//    float baseVal = base / 255.0f;
+//    // range / 255.0f = 1.0f / x => x = 1 / range * 255.0f
+//    float rangeDiv = 1.0f / range * 255.0f;
+//    // rangeVal = cos(curVal)/rangeDiv
+//    return cos(curVal) / rangeDiv;
+//}
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // 当用户改变窗口的大小的时候，视口也应该被调整
@@ -324,27 +375,27 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
-void mouse_callback(GLFWwindow *window, double xpos, double ypos)
-{
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
-{
-    camera.ProcessMouseScroll(yoffset);
-}
+//void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+//{
+//    if (firstMouse)
+//    {
+//        lastX = xpos;
+//        lastY = ypos;
+//        firstMouse = false;
+//    }
+//
+//    float xoffset = xpos - lastX;
+//    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+//
+//    lastX = xpos;
+//    lastY = ypos;
+//
+//    camera.ProcessMouseMovement(xoffset, yoffset);
+//}
+//
+//// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+//// ----------------------------------------------------------------------
+//void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+//{
+//    camera.ProcessMouseScroll(yoffset);
+//}
