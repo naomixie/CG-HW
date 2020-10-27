@@ -9,7 +9,6 @@
 #include <iostream>
 #include <stdio.h>
 
-
 #include "include/shader.h"
 #include "include/camera.h"
 #include "include/model.h"
@@ -21,37 +20,22 @@ void processInput(GLFWwindow *window);
 void updateLight();
 float calColor(float base, float range, float curVal);
 
+const char *vertexShaderSource = "#version 330 core\n"
+                                 "layout (location = 0) in vec3 aPos;\n"
+                                 "void main()\n"
+                                 "{\n"
+                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                 "}\0";
+const char *fragmentShaderSource = "#version 330 core\n"
+                                   "out vec4 FragColor;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                   "}\n\0";
+
 // settings 屏幕大小
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-//// camera 摄像机位置
-//Camera camera(glm::vec3(0.0f, 0.0f, 15.0f), glm::vec3(0.0, 10.0, 0.0));
-//float lastX = SCR_WIDTH / 2.0f;
-//float lastY = SCR_HEIGHT / 2.0f;
-//bool firstMouse = true;
-//float radius = 10.0f;                  //Initial radius for camera rotation
-//const float nearest_distance = 5.0f;   //Nearest distance for camera rotation
-//const float furthest_distance = 25.0f; //Furthest distance for camera rotation
-//const float move_velocity = 3.0f;      // speed of camera movement
-
-// timing 记录帧与帧之间的时间差
-// float deltaTime = 0.0f;
-// float lastFrame = 0.0f;
-
-// // Lighting Position
-// float const light_radius = 8.0f;                                                          // radius of light_object on the y = 5.0f coplanar
-// float const light_velocity = 2.0f;                                                        // velocity of light_object
-// float light_angle = 0.0f;                                                                 // angle of light and axis
-// glm::vec3 lightPos(light_radius *sin(light_angle), 5.0f, light_radius *cos(light_angle)); // initial position(r,5,0)
-// glm::vec3 lightColor(0.0f, 0.0f, 0.0f);                                                   // Record the RGB of the light
-
-//class FileRead {
-//    public ifstream myfile("../resources/overlapping.txt");
-//
-//
-//};
-
 
 int main()
 {
@@ -63,7 +47,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-// For MacOS
+    // For MacOS
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -81,54 +65,6 @@ int main()
     glfwMakeContextCurrent(window);
     // 注册这个函数，告诉GLFW我们希望每当窗口调整大小的时候调用这个函数
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    // 当鼠标移动时调用这个函数
-    // glfwSetCursorPosCallback(window, mouse_callback);
-    // 当鼠标Scroll的时候调用这个函数
-    // glfwSetScrollCallback(window, scroll_callback);
-
-    // tell GLFW to capture our mouse
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    cout << "DEBUGGING" << endl;
-
-    //ifstream myfile("../resources/overlapping.txt");
-    FILE* mFile = fopen("../resources/overlapping.txt","r");
-    string temp;
-    char readline[100];
-    float vertices[72];
-    //int vertices[73];
-    if (mFile == NULL) perror("Error opening file");
-    else
-    {
-        int count = 0;
-        while (!feof(mFile))
-        {
-            fscanf(mFile, "%f %f %f ",&vertices[count], &vertices[count+1], &vertices[count+2]);   //Vertex 1 for triangle
-            fscanf(mFile, "%f %f %f ", &vertices[count+6], &vertices[count + 7], &vertices[count + 8]);   //Vertex 2 for triangle
-            fscanf(mFile, "%f %f %f ", &vertices[count+12], &vertices[count + 13], &vertices[count + 14]);   //Vertex 3 for triangle
-            fscanf(mFile, "%f %f %f ", &vertices[count+3], &vertices[count + 4], &vertices[count + 5]);   // Color for vertex 1
-            fscanf(mFile, "%f %f %f ", &vertices[count + 9], &vertices[count + 10], &vertices[count + 11]);   //Vertex 2 for triangle
-            fscanf(mFile, "%f %f %f\n", &vertices[count + 15], &vertices[count + 16], &vertices[count + 17]);   //Vertex 3 for triangle
-            count += 18;
-            //fscanf(mFile, "%i %i %i ", &vertices[count], &vertices[count + 1], &vertices[count + 2]);   //Vertex 1 for triangle
-            //fscanf(mFile, "%i %i %i ", &vertices[count + 6], &vertices[count + 7], &vertices[count + 8]);   //Vertex 2 for triangle
-            //fscanf(mFile, "%i %i %i ", &vertices[count + 12], &vertices[count + 13], &vertices[count + 14]);   //Vertex 3 for triangle
-            //fscanf(mFile, "%i %i %i ", &vertices[count + 3], &vertices[count + 4], &vertices[count + 5]);   // Color for vertex 1
-            //fscanf(mFile, "%i %i %i ", &vertices[count + 9], &vertices[count + 10], &vertices[count + 11]);   //Vertex 2 for triangle
-            //fscanf(mFile, "%i %i %i\n", &vertices[count + 15], &vertices[count + 16], &vertices[count + 17]);   //Vertex 3 for triangle
-            //count += 18;
-            //fscanf(mFile, "%i ", &count);
-            //cout << count << endl;
-            /*char buffer[100];
-            fgets(buffer,100,mFile);
-            fputs(buffer, stdout);*/
-        }
-        fclose(mFile);
-        for (int i = 0; i < 72; i++) {
-            cout << vertices[i] << "\t";
-        }
-    }
-
-    //return 0;
 
     // glad: load all OpenGL function pointers 初始化GLAD
     // ---------------------------------------
@@ -138,9 +74,6 @@ int main()
         return -1;
     }
 
-    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    // stbi_set_flip_vertically_on_load(true);
-
     // configure global opengl state
     // -----------------------------
     // glEnable(GL_DEPTH_TEST);
@@ -148,167 +81,231 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader ourShader("../shaders/vs.shader", "../shaders/fs.shader");
-    Shader lightCubeShader("../shaders/light_cube.vs", "../shaders/light_cube.fs");
-
-    // load models
-    // -----------
-    // Model ourModel("../resources/teapot.obj");
+    // build and compile our shader program
+    // ------------------------------------
+    // vertex shader
+    //int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    //glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    //glCompileShader(vertexShader);
+    //// check for shader compile errors
+    //int success;
+    //char infoLog[512];
+    //glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    //if (!success)
+    //{
+    //    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    //    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    //}
+    //// fragment shader
+    //int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    //glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    //glCompileShader(fragmentShader);
+    //// check for shader compile errors
+    //glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    //if (!success)
+    //{
+    //    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    //    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    //}
+    //// link shaders
+    //int shaderProgram = glCreateProgram();
+    //glAttachShader(shaderProgram, vertexShader);
+    //glAttachShader(shaderProgram, fragmentShader);
+    //glLinkProgram(shaderProgram);
+    //// check for linking errors
+    //glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    //if (!success) {
+    //    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+    //    std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    //}
+    //glDeleteShader(vertexShader);
+    //glDeleteShader(fragmentShader);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    //float vertices[] = {
-    //    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-    //    0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-    //    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-    //    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-    //    -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-    //    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
 
-    //    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    // Reading from txt------------------------------------------------------------------------------------
+    const char *filePath = "../resources/overlapping.txt";
+    float triangle_one[18], triangle_two[18], triangle_three[18], triangle_four[18];
+    //float color_one[9], color_two[9], color_three[9], color_four[9];
+    FILE *mFile = fopen(filePath, "r");
 
-    //    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-    //    -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-    //    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-    //    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-    //    -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-    //    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+    if (mFile == NULL)
+        perror("Error opening file");
+    else
+    {
+        int count = 0;
+        while (!feof(mFile))
+        {
+            //fscanf(mFile, "%f %f %f ", &vertices[count], &vertices[count + 1], &vertices[count + 2]);   //Vertex 1 for triangle
+            //fscanf(mFile, "%f %f %f ", &vertices[count + 6], &vertices[count + 7], &vertices[count + 8]);   //Vertex 2 for triangle
+            //fscanf(mFile, "%f %f %f ", &vertices[count + 12], &vertices[count + 13], &vertices[count + 14]);   //Vertex 3 for triangle
+            //fscanf(mFile, "%f %f %f ", &vertices[count + 3], &vertices[count + 4], &vertices[count + 5]);   // Color for vertex 1
+            //fscanf(mFile, "%f %f %f ", &vertices[count + 9], &vertices[count + 10], &vertices[count + 11]);   //Color for vertex 2
+            //fscanf(mFile, "%f %f %f\n", &vertices[count + 15], &vertices[count + 16], &vertices[count + 17]);   //Color for vertex 3
+            fscanf(mFile, "%f %f %f %f %f %f %f %f %f ", &triangle_one[count], &triangle_one[count + 1], &triangle_one[count + 2], &triangle_one[count + 6], &triangle_one[count + 7], &triangle_one[count + 8], &triangle_one[count + 12], &triangle_one[count + 13], &triangle_one[count + 14]);                          //Vertex 1 for triangle
+            fscanf(mFile, "%f %f %f %f %f %f %f %f %f\n", &triangle_one[count + 3], &triangle_one[count + 4], &triangle_one[count + 5], &triangle_one[count + 9], &triangle_one[count + 10], &triangle_one[count + 11], &triangle_one[count + 15], &triangle_one[count + 16], &triangle_one[count + 17]);                   //Vertex 1 for triangle
+            fscanf(mFile, "%f %f %f %f %f %f %f %f %f ", &triangle_two[count], &triangle_two[count + 1], &triangle_two[count + 2], &triangle_two[count + 6], &triangle_two[count + 7], &triangle_two[count + 8], &triangle_two[count + 12], &triangle_two[count + 13], &triangle_two[count + 14]);                          //Vertex 1 for triangle
+            fscanf(mFile, "%f %f %f %f %f %f %f %f %f\n", &triangle_two[count + 3], &triangle_two[count + 4], &triangle_two[count + 5], &triangle_two[count + 9], &triangle_two[count + 10], &triangle_two[count + 11], &triangle_two[count + 15], &triangle_two[count + 16], &triangle_two[count + 17]);                   //Vertex 1 for triangle
+            fscanf(mFile, "%f %f %f %f %f %f %f %f %f ", &triangle_three[count], &triangle_three[count + 1], &triangle_three[count + 2], &triangle_three[count + 6], &triangle_three[count + 7], &triangle_three[count + 8], &triangle_three[count + 12], &triangle_three[count + 13], &triangle_three[count + 14]);        //Vertex 1 for triangle
+            fscanf(mFile, "%f %f %f %f %f %f %f %f %f\n", &triangle_three[count + 3], &triangle_three[count + 4], &triangle_three[count + 5], &triangle_three[count + 9], &triangle_three[count + 10], &triangle_three[count + 11], &triangle_three[count + 15], &triangle_three[count + 16], &triangle_three[count + 17]); //Vertex 1 for triangle
+            fscanf(mFile, "%f %f %f %f %f %f %f %f %f ", &triangle_four[count], &triangle_four[count + 1], &triangle_four[count + 2], &triangle_four[count + 6], &triangle_four[count + 7], &triangle_four[count + 8], &triangle_four[count + 12], &triangle_four[count + 13], &triangle_four[count + 14]);                 //Vertex 1 for triangle
+            fscanf(mFile, "%f %f %f %f %f %f %f %f %f\n", &triangle_four[count + 3], &triangle_four[count + 4], &triangle_four[count + 5], &triangle_four[count + 9], &triangle_four[count + 10], &triangle_four[count + 11], &triangle_four[count + 15], &triangle_four[count + 16], &triangle_four[count + 17]);          //Vertex 1 for triangle
+            //fscanf(mFile, "%f %f %f %f %f %f %f %f %f ", &triangle_two[count], &triangle_two[count + 1], &triangle_two[count + 2], &triangle_two[count + 3], &triangle_two[count + 4], &triangle_two[count + 5], &triangle_two[count + 6], &triangle_two[count + 7], &triangle_two[count + 8]);   //Vertex 1 for triangle
+            //fscanf(mFile, "%f %f %f %f %f %f %f %f %f\n", &color_two[count], &color_two[count + 1], &color_two[count + 2], &color_two[count + 3], &color_two[count + 4], &color_two[count + 5], &color_two[count + 6], &color_two[count + 7], &color_two[count + 8]);   //Vertex 1 for triangle
+            //fscanf(mFile, "%f %f %f %f %f %f %f %f %f ", &triangle_three[count], &triangle_three[count + 1], &triangle_three[count + 2], &triangle_three[count + 3], &triangle_three[count + 4], &triangle_three[count + 5], &triangle_three[count + 6], &triangle_three[count + 7], &triangle_three[count + 8]);   //Vertex 1 for triangle
+            //fscanf(mFile, "%f %f %f %f %f %f %f %f %f\n", &color_three[count], &color_three[count + 1], &color_three[count + 2], &color_three[count + 3], &color_three[count + 4], &color_three[count + 5], &color_three[count + 6], &color_three[count + 7], &color_three[count + 8]);   //Vertex 1 for triangle
+            //fscanf(mFile, "%f %f %f %f %f %f %f %f %f ", &triangle_four[count], &triangle_four[count + 1], &triangle_four[count + 2], &triangle_four[count + 3], &triangle_four[count + 4], &triangle_four[count + 5], &triangle_four[count + 6], &triangle_four[count + 7], &triangle_four[count + 8]);   //Vertex 1 for triangle
+            //fscanf(mFile, "%f %f %f %f %f %f %f %f %f\n", &color_four[count], &color_four[count + 1], &color_four[count + 2], &color_four[count + 3], &color_four[count + 4], &color_four[count + 5], &color_four[count + 6], &color_four[count + 7], &color_four[count + 8]);   //Vertex 1 for triangle
+            count += 9; // finished 1 triangle
+        }
+        fclose(mFile);
+        for (int i = 0; i < 18; i++)
+        {
+            //cout << vertices[i] << "\t";
+            //vertices[i] /= 100;
+            if (i == 0 || i == 1 || i == 2 || i == 6 || i == 7 || i == 8 || i == 12 || i == 13 || i == 14)
+            {
+                triangle_one[i] = triangle_one[i] / 100.0f;
+                triangle_two[i] = triangle_two[i] / 100.0f;
+                triangle_three[i] = triangle_three[i] / 100.0f;
+                triangle_four[i] = triangle_four[i] / 100.0f;
+            }
+            //cout << triangle_one[i] / 100.0f << "\t";/*
+            //cout << triangle_two[i] / 100.0f << "\t";
+            //cout << triangle_three[i] / 100.0f << "\t";
+            //cout << triangle_four[i] / 100.0f << "\t";
+            //cout << endl;*/
+            cout << triangle_one[i] << "\t";
+            cout << triangle_two[i] << "\t";
+            cout << triangle_three[i] << "\t";
+            cout << triangle_four[i] << "\t";
+            cout << endl;
+        }
+    }
 
-    //    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-    //    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-    //    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-    //    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-    //    0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-    //    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    float firstTriangle[] = {
+        1.0f, 0.0f, 0.0f, // left
+        0.0f, 1.0f, 0.0f, // right
+        0.0f, 0.0f, 1.0f, // top
+    };
+    float secondTriangle[] = {
+        1.0f, 0.0f, 0.0f, // left
+        0.0f, 1.0f, 0.0f, // right
+        0.0f, 0.0f, 1.0f, // top
+    };
+    float thirdTriangle[] = {
+        1.0f, 0.0f, 0.0f, // left
+        0.0f, 1.0f, 0.0f, // right
+        0.0f, 0.0f, 1.0f, // top
+    };
+    float fourthTriangle[] = {
+        1.0f, 0.0f, 0.0f, // left
+        0.0f, 1.0f, 0.0f, // right
+        0.0f, 0.0f, 1.0f, // top
+    };
+    unsigned int VBOs[4], VAOs[4], CVBOs[4], CVAOs[4];
+    glGenVertexArrays(4, VAOs); // we can also generate multiple VAOs or buffers at the same time
+    glGenBuffers(4, VBOs);
 
-    //    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-    //    0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-    //    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-    //    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-    //    -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-    //    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+    // first triangle setup
+    // --------------------
+    glBindVertexArray(VAOs[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_one), triangle_one, GL_STATIC_DRAW);
+    //GLint colAttrib = glGetAttribLocation(ourShader.ID, "position");
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0); // Vertex attributes stay the same
+    glEnableVertexAttribArray(0);
 
-    //    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-    //    0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-    //    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-    //    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-    //    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-    //    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
-    //// first, configure the cube's VAO (and VBO)
-    //unsigned int VBO;
-    //glGenBuffers(1, &VBO);
+    //glBindVertexArray(CVAOs[0]);
+    //glBindBuffer(GL_ARRAY_BUFFER, CVBOs[0]);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
+    // GLint colAttrib = glGetAttribLocation(ourShader.ID, "color");
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // // glBindVertexArray(0); // no need to unbind at all as we directly bind a different VAO the next few lines
+    // // second triangle setup
+    // // ---------------------
+    glBindVertexArray(VAOs[1]);             // note that we bind to a different VAO now
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // and a different VBO
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_two), triangle_two, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0); // because the vertex data is tightly packed we can also specify 0 as the vertex attribute's stride to let OpenGL figure it out
+    glEnableVertexAttribArray(0);
 
-    //// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-    //unsigned int lightCubeVAO;
-    //glGenVertexArrays(1, &lightCubeVAO);
-    //glBindVertexArray(lightCubeVAO);
+    // //glBindVertexArray(CVAOs[1]);
+    // //glBindBuffer(GL_ARRAY_BUFFER, CVBOs[1]);
+    // //glBufferData(GL_ARRAY_BUFFER, sizeof(color_two), color_two, GL_STATIC_DRAW);
+    // colAttrib = glGetAttribLocation(ourShader.ID, "color");
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 
-    //// we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // // glBindVertexArray(0); // not really necessary as well, but beware of calls that could affect VAOs while this one is bound (like binding element buffer objects, or enabling/disabling vertex attributes)
+    // // third triangle setup
+    // // --------------------
+     glBindVertexArray(VAOs[2]);
+     glBindBuffer(GL_ARRAY_BUFFER, VBOs[2]);
+     glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_three), triangle_three, GL_STATIC_DRAW);
+     glEnableVertexAttribArray(0);
+     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);	// Vertex attributes stay the same
 
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-    //glEnableVertexAttribArray(0);
+     glEnableVertexAttribArray(1);
+     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
-    // float const green_value = 150.0f / 255.0f;
-    // float red_value = 1.0f;  //Initial Value Equals
-    // float blue_value = 0.0f; //Initial Value Equals 0
+    // // fourth triangle setup
+    // // ---------------------
+     glBindVertexArray(VAOs[3]);	// note that we bind to a different VAO now
+     glBindBuffer(GL_ARRAY_BUFFER, VBOs[3]);	// and a different VBO
+     glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_four), triangle_four, GL_STATIC_DRAW);
+     glEnableVertexAttribArray(0);
+     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // because the vertex data is tightly packed we can also specify 0 as the vertex attribute's stride to let OpenGL figure it out
 
-    // draw in wireframe
+     glEnableVertexAttribArray(1);
+     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+
+    // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
     // -----------
-    // glfwWindowShouldClose函数在我们每次循环的开始前检查一次GLFW是否被要求退出，
-    // 如果是的话该函数返回true然后渲染循环便结束了，之后为我们就可以关闭应用程序了。
     while (!glfwWindowShouldClose(window))
     {
-        // per-frame time logic
-        //// --------------------
-        //float currentFrame = glfwGetTime();
-        //deltaTime = currentFrame - lastFrame; // 两个帧之间的时间差
-        //lastFrame = currentFrame;
-        // printf("deltaFrame = %f \n", deltaTime);
-
-        // input
-        // -----
-        // processInput(window);
-        // updateLight();
 
         // render
         // ------
-        // 设置清空屏幕所用的颜色
-        // IMP：这里修改背景颜色
-        // glClearColor((150.0f / 255.0f + cos(currentFrame) / 5) / 2 + cos(lightColor.x) / 2, green_value / 2 + cos(lightColor.y) / 2, (150.0f / 255.0f + sin(currentFrame) / 5) / 2 + (185.0f / 255.0f + cos(lightColor.z) / 3.63f) / 2, 0.6f);
-        // 清空屏幕
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-        //// 让camera旋转
-        //glm::mat4 view = glm::mat4(10.0f); // make sure to initialize matrix to identity matrix first
-        //camera.RotateOnObject(radius);
-        //view = camera.GetViewMatrixR(glm::vec3(0.0, 2.0, 0.0)); // Set Center of Model is 2.0 instead of 0.0
-
-        // don't forget to enable shader before setting uniforms
+        //glUseProgram(shaderProgram);
         ourShader.use();
-
-        // Set Object Color
-        //red_value = 150.0f / 255.0f + cos(currentFrame) / 5;
-        //blue_value = 150.0f / 255.0f + sin(currentFrame) / 5;
-
-        //ourShader.setVec3("objectColor", red_value, green_value, blue_value);
-        //ourShader.setVec3("lightColor", cos(lightColor.x), cos(lightColor.y), cos(lightColor.z));
-        //ourShader.setVec3("lightPos", lightPos);
-        //ourShader.setVec3("viewPos", camera.Position);
-        //// view/projection transformations
-        //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        //ourShader.setMat4("projection", projection);
-        //ourShader.setMat4("view", view);
-
-        //// render the loaded model
-        //glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        //model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));     // it's a bit too big for our scene, so scale it down
-        //ourShader.setMat4("model", model);
-        //ourModel.Draw(ourShader);
-
-        //// draw the lamp object
-        //lightCubeShader.use();
-        //lightCubeShader.setMat4("projection", projection);
-        //lightCubeShader.setVec3("lightCubeColor", cos(lightColor.x), cos(lightColor.y), 185.0f / 255.0f + cos(lightColor.z) / 3.63f);
-        //lightCubeShader.setMat4("view", view);
-        //model = glm::mat4(1.0f);
-        //model = glm::translate(model, lightPos);
-        //model = glm::scale(model, glm::vec3(0.8f)); // a smaller cube
-        //lightCubeShader.setMat4("model", model);
-
-        //glBindVertexArray(lightCubeVAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        // draw first triangle using the data from the first VAO
+        glBindVertexArray(VAOs[0]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // then we draw the second triangle using the data from the second VAO
+         glBindVertexArray(VAOs[1]);
+         glDrawArrays(GL_TRIANGLES, 0, 3);
+        // draw third triangle using the data from the first VAO
+         glBindVertexArray(VAOs[2]);
+         glDrawArrays(GL_TRIANGLES, 0, 3);
+        // draw the fourth triangle using the data from the second VAO
+         glBindVertexArray(VAOs[3]);
+         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
-        // glfwSwapBuffers函数会交换颜色缓冲（它是一个储存着GLFW窗口每一个像素颜色值的大缓冲），
-        // 它在这一迭代中被用来绘制，并且将会作为输出显示在屏幕上。
         glfwSwapBuffers(window);
-        // glfwPollEvents函数检查有没有触发什么事件（比如键盘输入、鼠标移动等）
-        // 更新窗口状态，并调用对应的回调函数（可以通过回调方法手动设置）。
         glfwPollEvents();
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
-    //// ------------------------------------------------------------------------
-    //glDeleteVertexArrays(1, &lightCubeVAO);
-    //glDeleteBuffers(1, &VBO);
+    // ------------------------------------------------------------------------
+    glDeleteVertexArrays(2, VAOs);
+    glDeleteBuffers(2, VBOs);
+    //glDeleteProgram(ourShader);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
-    // 当渲染循环结束后我们需要正确释放/删除之前的分配的所有资源。
-    // 我们可以在main函数的最后调用glfwTerminate函数来完成。
     glfwTerminate();
     return 0;
 }
