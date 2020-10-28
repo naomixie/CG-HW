@@ -7,6 +7,8 @@
 
 #include <fstream>
 #include <iostream>
+
+using namespace std;
 #include <stdio.h>
 
 #include "include/shader.h"
@@ -25,12 +27,186 @@ float calColor(float base, float range, float curVal);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+// class Point
+// {
+// public:
+//     float x;
+//     float y;
+//     float z;
+//     Edge edge_1;
+//     Edge edge_2;
+//     Point point_1;
+//     Point point_2;
+// }
+
+class Edge
+{
+public:
+    int ymax;               // 判断是否有交点的依据就是看扫描线y是否大于这条边两个端点的y坐标值
+    float xi;               // 下一个x
+    float dx;               // 扫描线增加一次x坐标的增值
+    // Edge* nextEdge;     
+    // Edge() {
+    //     nextEdge = NULL;
+    // }
+    Edge(int y, float x, float dx) {
+        this->ymax = y;
+        this->deltax = dx;
+        this->x = x;
+    }
+
+};
+const GLint WIDTH = 800, HEIGHT = 800;
+// a 顶点数组， n 定点数量
+// 创建边的分类表
+int* creatET(map<int, Edge*>& ET, int* a, int n)
+{
+
+    int maxy, miny, ymax, ymin, x;
+    float dx;
+    maxy = a[1];        
+    miny = a[1];
+    //cout << n;
+    for (int i = 0; i < n - 2; i = i + 2)
+    {
+
+        if (a[i + 1] > maxy)
+        {
+            maxy = a[i + 1];
+        }
+        if (a[i + 1] < miny)
+        {
+            miny = a[i + 1];
+        }
+        if (a[i + 1] != a[i + 3])//斜率为0
+        {
+            if (a[i + 1] < a[i + 3])
+            {
+                ymax = a[i + 3];
+                ymin = a[i + 1];
+                x = a[i];
+            }
+            else
+            {
+                ymax = a[i + 1];
+                ymin = a[i + 3];
+                x = a[i + 2];
+            }
+
+            dx = (float)(a[i + 2] - a[i]) / (a[i + 3] - a[i + 1]);
+            if (ET[ymin] == NULL)
+            {
+                Edge* edge = new Edge(ymax, x, dx);
+                ET[ymin] = edge;
+            }
+            else
+            {
+                Edge* p = ET[ymin];
+                while (p->nextEdge != NULL)
+                {
+                    p = p->nextEdge;
+                }
+                Edge* edge = new Edge(ymax, x, dx);
+                p->nextEdge = edge;
+            }
+
+        }
+
+    }
+    int* h = new int[2];
+    h[0] = maxy;
+    h[1] = miny;
+    return h;
+}
+vector<GLfloat> filling(int miny, int maxy, map<int, Edge*>& ET) {
+    GLfloat px, py;
+    vector<GLfloat> fill;
+    Edge* AET = new Edge();     // 活边表
+    //扫描从所有图形最小y值到最大y值
+    for (int i = miny; i < maxy; i++)
+    {
+        //如果 ET[y] 非空，则将其中的所有边取出并插入到AET中，按x（若x相等则按∆x）递增方向排序。
+        while (ET[i] != NULL)
+        {
+            Edge* p = ET[i];
+            Edge* AETp = AET;
+            // 活边表中有next边
+            while (AETp->nextEdge)
+            {
+                // 相交边的x值大于活边表中的一个边的x值
+                if (p->x > AETp->nextEdge->x)
+                {
+                    // 活边表的
+                    AETp = AETp->nextEdge;
+                    continue;
+                }
+                if (p->x == AETp->nextEdge->x && p->deltax > AETp->nextEdge->deltax)
+                {
+                    AETp = AETp->nextEdge;
+                    continue;
+                }
+                break;
+            }
+            ET[i] = p->nextEdge;
+
+            p->nextEdge = AETp->nextEdge;
+
+            AETp->nextEdge = p;
+
+        }
+
+        Edge* p = AET;
+        // 若AET非空，将AET中的边按顺序两两配对并填色。
+        while (p->nextEdge && p->nextEdge->nextEdge)
+        {
+            for (int x = (int)p->nextEdge->x + 1; x < (int)p->nextEdge->nextEdge->x; x++)
+            {
+                //cout << x << ' ' <<i<< endl;
+                px = x * 1.0f / WIDTH;
+                py = i * 1.0f / HEIGHT;
+                //cout << px << ' ' << py << endl;
+                fill.push_back(px);
+                fill.push_back(py);
+                fill.push_back(0.0f);
+            }
+            p = p->nextEdge->nextEdge;
+        }
+
+        //  删去AET中满足y=ymax+1的边。
+        p = AET;
+        while (p->nextEdge)
+        {
+            if (p->nextEdge->ymax == i+1)
+            {
+
+                Edge* pDelete = p->nextEdge;
+                p->nextEdge = pDelete->nextEdge;
+                pDelete->nextEdge = NULL;
+                delete pDelete;
+            }
+            else
+            {
+                p = p->nextEdge;
+            }
+        }
+
+        // 对于AET中所有边，赋值x = x + ∆x。
+        p = AET;
+        while (p->nextEdge)
+        {
+            p->nextEdge->x += p->nextEdge->deltax;
+            p = p->nextEdge;
+        }
+        // y = y + 1
+    }
+    return fill;
+}
+
+
+
 int main()
 {
-    // glfw: initialize and configure
-    // ------------------------------
     glfwInit(); // Initialize GLFW
-    // glfWindowHint 配置GFLFW，这里说明了使用OpenGL3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -41,7 +217,6 @@ int main()
 #endif
 
     // glfw window creation
-    // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Homework2 Naomi", NULL, NULL);
     if (window == NULL)
     {
@@ -65,6 +240,20 @@ int main()
     // configure global opengl state
     // -----------------------------
     //glEnable(GL_DEPTH_TEST);
+
+    map<int, Edge*> ET;         //变得分类表
+    int a[] = { 0,0,173,100,100,100,91,121,70,130,49,121,40,
+    100,49,79,70,70,93,77,100,100,173,100,141,141,100,173,0,
+    200,-100,173,-141,141,-173,100,-200,0,-173,-100,-141,-141,
+    -100,-173,0,-200,100,-173,141,-141,173,-100,0,0,110,0,119,
+    21,140,30,161,21,170,0,161,-21,140,-30,119,-21,110,0,0,0};
+    //吃豆人 输入坐标最后需要回到起点
+    //int a[] = { 0,40,-20,80,-50,100,-100,100,-130,80,-150,30,-150,-30,-85,-120,0,-180,85,-120,150,-30,150,30,130,80,100,100,50,100,20,80 ,0,40 };
+    int* large = creatET(ET, a, sizeof(a) / sizeof(a[0]));      //创建边的分类表，返回的large存最高点y左边，最低点y坐标
+    vector<GLfloat> fill = filling(large[1], large[0], ET);     //large[1] 最小y值, large[0] 最大y值   
+    GLfloat* vertices = fill.data();
+    int size = fill.size();
+
 
     // build and compile shaders
     // -------------------------
