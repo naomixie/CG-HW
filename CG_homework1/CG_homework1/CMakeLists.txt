@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(CG_OpenGL)
+project(HW2)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 11)
 option(GLFW_BUILD_TESTS OFF)
 option(GLFW_BUILD_DOCS OFF)
 option(GLFW_BUILD_EXAMPLES OFF)
-add_subdirectory(External/glfw-master)
-include_directories(External/glfw-master/include)
+add_subdirectory(External/glfw)
+include_directories(External/glfw/include)
 LIST(APPEND LIBS glfw ${GLFW_LIBRARIES})
 
 #glad
@@ -20,6 +20,11 @@ include_directories(External/glad-c/include)
 
 #glm
 include_directories(External/glm-0.9.9.7)
+
+#glut
+#add_subdirectory(External/freeglut)
+#include_directories(External/freeglut/include)
+#LIST(APPEND LIBS freeglut)
 
 #assimp
 option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
