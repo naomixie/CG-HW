@@ -102,8 +102,8 @@ public:
     /*Get z axis value from y axis value for this edge(when scanline is scanning and we
     require the z value of the 相交点 so that we could calculate the dxz of y切面上的xz直线)*/
     GLfloat getZfromY(GLfloat y) {
-        //cout << "Value of dyz: " << dyz << endl;
-        if (isinf(dyz)|| dyz == 0) {
+        cout << "Value of dyz: " << dyz <<"zman: "<<zmax<<"zmin: "<<zmin<<"ymax: "<<ymax<<"ymin: "<<ymin<< endl;
+        if (isinf(dyz)|| dyz == 0.0f) {
             rz = zmin;
             return rz;
         }
@@ -118,20 +118,24 @@ public:
             bxz = zmin;
         }
     }
+    // x横坐标，y纵坐标
     void calculateDXY(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2) {
         dxy = (y1 - y2) / (x1 - x2);
         bxy = y1 - dxy * x1;
         if (x1 == x2) {
             //垂直
-            bxy = ymin;
+            //bxy = ymin;
+            bxy = 0;
         }
 
     }
+    // y横坐标 z纵坐标
     void calculateDYZ(GLfloat y1, GLfloat z1, GLfloat y2, GLfloat z2) {
         dyz = (z1 - z2) / (y1 - y2);
         byz = z1 - dyz * y1;
         if (y1 == y2) {
-            byz = zmin;
+            //byz = zmin;
+            byz = 0;
         }
     }
 };
@@ -160,7 +164,8 @@ class QEdge {
             dxz = (z1 - z2) / (x1 - x2);
             bxz = z1 - dxz * x1;
             if (x1 = x2) {
-                bxz = zmin;
+                //bxz = zmin;
+
             }
         }
 
@@ -384,7 +389,7 @@ int main(void)
                     cout << "it1->info.id = " << it1->info.id << "\tit2->info.id = " << it2->info.id << endl;
                     for (int i = (int)r2.minx.first; i < (int)r2.maxx.first; i++) {
                         cout << "it1->cutEdge.getZfromX(i) = " << it1->cutEdge.getZfromX(i) << "\tit2->cutEdge.getZfromX(i) = " << it2->cutEdge.getZfromX(i) << endl;
-                        if (it1->cutEdge.getZfromX(i) < it2->cutEdge.getZfromX(i)) {
+                        if (it1->cutEdge.getZfromX(i) > it2->cutEdge.getZfromX(i)) {
                             cout << "11111111111111111" << endl;
                             image[y][i][0] = image[y][i][1] = image[y][i][2] = it1->info.id * 0.2f;
                         }
