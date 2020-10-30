@@ -9,8 +9,11 @@
 #include<array>
 #include<list>
 using namespace::std;
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 800
+//#define SCREEN_WIDTH 800
+//#define SCREEN_HEIGHT 800
+
+#define SCREEN_WIDTH 720
+#define SCREEN_HEIGHT 720
 
 GLfloat image[SCREEN_HEIGHT][SCREEN_WIDTH][3] = { 0 };
 
@@ -234,6 +237,8 @@ struct infos {
     pair<GLfloat, GLfloat> maxx;
     int id;
 };
+
+
 class Range {
 public:
     infos info;
@@ -278,33 +283,7 @@ void mixColors(int id, GLfloat x, GLfloat y, GLfloat& red, GLfloat& green, GLflo
 
 }
 
-int main(void)
-{
-    GLFWwindow* window;
-
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-
-
-
-    // 背景为白色
-    for (int x = 0; x < SCREEN_WIDTH; ++x) {
-        for (int y = 0; y < SCREEN_HEIGHT; ++y) {
-            image[y][x][0] = image[y][x][1] = image[y][x][2] = 1.0f;
-        }
-    }
+void fill() {
 
     // Reading from txt------------------------------------------------------------------------------------
     const char* filePath = "../resources/overlapping.txt";
@@ -318,7 +297,7 @@ int main(void)
         for (int i = 0; i < 4 && !feof(mFile); i++) {
             for (int j = 0; j < 18 && !feof(mFile); j++) {
                 fscanf(mFile, "%f ", &triangles[i][j]);
-                cout << triangles[i][j]<<"\t";
+                cout << triangles[i][j] << "\t";
                 if (j < 9 && j != 2 && j != 5 && j != 8) {
                     triangles[i][j] += 100;
                     triangles[i][j] *= 4;
@@ -331,16 +310,16 @@ int main(void)
                     if (Scanrangemaxy < triangles[i][j]) Scanrangemaxy = triangles[i][j];
                     if (Scanrangeminy > triangles[i][j]) Scanrangeminy = triangles[i][j];
                 }
-            }            
+            }
             // Register the edges
-            Edge e1(triangles[i][0], triangles[i][1], triangles[i][2], triangles[i][3], triangles[i][4], triangles[i][5],i,triangles[i][6],triangles[i][7],triangles[i][15],triangles[i][16],triangles[i][17]);
+            Edge e1(triangles[i][0], triangles[i][1], triangles[i][2], triangles[i][3], triangles[i][4], triangles[i][5], i, triangles[i][6], triangles[i][7], triangles[i][15], triangles[i][16], triangles[i][17]);
             EdgeTable[cnt] = e1; // i indicates which triangle this edge belongs to
-            Edge e2(triangles[i][3], triangles[i][4], triangles[i][5], triangles[i][6], triangles[i][7], triangles[i][8],i, triangles[i][0], triangles[i][1], triangles[i][9], triangles[i][10], triangles[i][11]);
-            EdgeTable[cnt+1] = e2; // i indicates which triangle this edge belongs to
-            Edge e3(triangles[i][0], triangles[i][1], triangles[i][2], triangles[i][6], triangles[i][7], triangles[i][8],i,triangles[i][3], triangles[i][4], triangles[i][12], triangles[i][13], triangles[i][14]);
-            EdgeTable[cnt+2] = e3; // i indicates which triangle this edge belongs to
+            Edge e2(triangles[i][3], triangles[i][4], triangles[i][5], triangles[i][6], triangles[i][7], triangles[i][8], i, triangles[i][0], triangles[i][1], triangles[i][9], triangles[i][10], triangles[i][11]);
+            EdgeTable[cnt + 1] = e2; // i indicates which triangle this edge belongs to
+            Edge e3(triangles[i][0], triangles[i][1], triangles[i][2], triangles[i][6], triangles[i][7], triangles[i][8], i, triangles[i][3], triangles[i][4], triangles[i][12], triangles[i][13], triangles[i][14]);
+            EdgeTable[cnt + 2] = e3; // i indicates which triangle this edge belongs to
             cnt += 3;
-            
+
         }
     }
 
@@ -353,8 +332,8 @@ int main(void)
 
     // Scan the data
     for (int y = 0; y < /*(int)Scanrangemaxy*/800; y++) {
-       /* cout << "----------BEGIN ONE SCAN ROUTINE---------------" << endl;
-        cout << "Current ScanLine Position y = " << y << endl;*/
+        /* cout << "----------BEGIN ONE SCAN ROUTINE---------------" << endl;
+         cout << "Current ScanLine Position y = " << y << endl;*/
 
         list<Edge> ActiveTable;
         // 得到活边表
@@ -362,7 +341,7 @@ int main(void)
         cout << "------------------------------------------------" << endl;
         */
         for (int i = 0; i < 12; i++) {
-            if (EdgeTable[i].ymin< y && EdgeTable[i].ymax >= y) {
+            if (EdgeTable[i].ymin < y && EdgeTable[i].ymax >= y) {
                 //说明扫描线与该边相交
                 ActiveTable.push_back(EdgeTable[i]);
                 //cout << "Colliding with line :" << i <<"\tid: "<< EdgeTable[i].id<< "\txmax: "<< EdgeTable[i].xmax<<"\txmin: " << EdgeTable[i].xmin << "\tymax: " << EdgeTable[i].ymax << "\tymin: " << EdgeTable[i].ymin << "\tzmax: " << EdgeTable[i].zmax << "\tzmin: " << EdgeTable[i].zmin << endl;
@@ -375,7 +354,7 @@ int main(void)
         list<Range> ranges;
         while (!ActiveTable.empty()) {
             //cout << "Check Active Table: size = " << ActiveTable.size() << endl;
-            
+
             Edge e = ActiveTable.back();
             ActiveTable.pop_back();
             for (list<Edge>::iterator it = ActiveTable.begin(); it != ActiveTable.end(); it++) {
@@ -384,7 +363,7 @@ int main(void)
                     /*cout << "Genererating Space : id =  "<< e.id<<"\t" << e.getXfromY(y) << " <-> " << it->getXfromY(y) << endl;
                     cout << "getXfromY dxy" << it->xmin << endl;
                     cout << "Creating QEdge with points: x1: " << e.getXfromY(y) << "\tx2: " << it->getXfromY(y) << "\tz1: " << e.getZfromY(y) << "\tz2: " << it->getZfromY(y)<<endl;*/
-                    Range r(e.id, e.getXfromY(y), it->getXfromY(y),e.getZfromY(y),it->getZfromY(y));
+                    Range r(e.id, e.getXfromY(y), it->getXfromY(y), e.getZfromY(y), it->getZfromY(y));
                     ranges.push_back(r);
                     ActiveTable.erase(it);
                     break;
@@ -407,18 +386,18 @@ int main(void)
             }
         }
         for (list<Range>::iterator it1 = ranges.begin(); it1 != ranges.end(); it1++) {
-                
+
             for (list<Range>::iterator it2 = it1; it2 != ranges.end(); it2++) {
                 if (it1 == it2) continue;
                 //cout << "These are the 2 ranges that we are analyzing: " << endl;
                 //cout << "Range 1: [" << it1->info.minx.first << " , " << it1->info.maxx.first<<" ] " << endl;
                 //cout << "Range 2: [" << it2->info.minx.first << " , " << it2->info.maxx.first << " ] " << endl;
-                if ((it1->info.minx.first > it2->info.minx.first && it1->info.minx.first < it2->info.maxx.first ) || (it1->info.maxx.first > it2->info.minx.first && it1->info.maxx.first < it2->info.maxx.first )
+                if ((it1->info.minx.first > it2->info.minx.first && it1->info.minx.first < it2->info.maxx.first) || (it1->info.maxx.first > it2->info.minx.first && it1->info.maxx.first < it2->info.maxx.first)
                     || (it2->info.minx.first > it1->info.minx.first && it2->info.minx.first < it1->info.maxx.first) || (it2->info.maxx.first > it1->info.minx.first && it2->info.maxx.first < it1->info.maxx.first)) {
                     //两个区间有交集
                     //排序得出三个区间
                     //cout << "There is an Intersection between these two ranges, divide them into 3 intersects: " << endl;
-                    infos r1,r2,r3;
+                    infos r1, r2, r3;
                     r1.minx = it1->info.minx.first < it2->info.minx.first ? it1->info.minx : it2->info.minx;
                     r1.id = it1->info.minx.first < it2->info.minx.first ? it1->info.id : it2->info.id;
                     r3.maxx = it1->info.maxx.first > it2->info.maxx.first ? it1->info.maxx : it2->info.maxx;
@@ -458,14 +437,97 @@ int main(void)
                         }
                     }
                 }
-                
-                
+
+
             }
-            
+
+        }
+    }
+}
+
+
+
+void getDepth() {
+    GLfloat r1 = 0.44f, g1 = 0.19f, b1 = 0.63f;
+    GLfloat r2 = 0.26f,g2 = 0.45f,b2 = 0.77f;
+    for (int y = 40; y < 360; y++) {
+        for (int x = 40; x < 360; x++) {
+            if ((y / 160 + x / 160) % 2 == 0) {
+                if ((x % 160) > 80 && (x % 160) < 160) {
+                    image[y][x][0] = r1, image[y][x][1] = g1, image[y][x][2] = b1;
+                    image[y + 320][x][0] = r1, image[y + 320][x][1] = g1, image[y + 320][x][2] = b1;
+                    image[y][x + 320][0] = r1, image[y][x + 320][1] = g1, image[y][x + 320][2] = b1;
+                    image[y + 320][x + 320][0] = r1, image[y + 320][x + 320][1] = g1, image[y + 320][x + 320][2] = b1;
+                }
+                if ((y % 160) > 80 && (y % 160) < 160) {
+                    image[y][x][0] = r2, image[y][x][1] = g2, image[y][x][2] = b2;
+                    image[y + 320][x][0] = r2, image[y + 320][x][1] = g2, image[y + 320][x][2] = b2;
+                    image[y][x + 320][0] = r2, image[y][x + 320][1] = g2, image[y][x + 320][2] = b2;
+                    image[y + 320][x + 320][0] = r2, image[y + 320][x + 320][1] = g2, image[y + 320][x + 320][2] = b2;
+                }
+            }
+            else
+            {
+                if ((y % 160) > 80 && (y % 160) < 160) {
+                    image[y][x][0] = r2, image[y][x][1] = g2, image[y][x][2] = b2;
+                    image[y + 320][x][0] = r2, image[y + 320][x][1] = g2, image[y + 320][x][2] = b2;
+                    image[y][x + 320][0] = r2, image[y][x + 320][1] = g2, image[y][x + 320][2] = b2;
+                    image[y + 320][x + 320][0] = r2, image[y + 320][x + 320][1] = g2, image[y + 320][x + 320][2] = b2;
+                }
+                if ((x % 160) > 80 && (x % 160) < 160) {
+                    image[y][x][0] = r1, image[y][x][1] = g1, image[y][x][2] = b1;
+                    image[y + 320][x][0] = r1, image[y + 320][x][1] = g1, image[y + 320][x][2] = b1;
+                    image[y][x + 320][0] = r1, image[y][x + 320][1] = g1, image[y][x + 320][2] = b1;
+                    image[y + 320][x + 320][0] = r1, image[y + 320][x + 320][1] = g1, image[y + 320][x + 320][2] = b1;
+                }
+
+            }
+        }
+    }
+    /*for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            for (int y = 40; y < 360; y++) {
+                for (int x = 0; x < 360; x++) {
+                    image[y + j * 360][x + i * 360][0] = image[y][x][0];
+                    image[y + j * 360][x + i * 360][1] = image[y][x][1];
+                    image[y + j * 360][x + i * 360][2] = image[y][x][2];
+                    cout << "Drawing Pixel (" << x + i * 360 << " , " << y + j * 360 << ")\n";
+                }
+            }
+        }
+    }*/
+}
+int main(void)
+{
+    GLFWwindow* window;
+
+    /* Initialize the library */
+    if (!glfwInit())
+        return -1;
+
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "HW2-3", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        return -1;
+    }
+
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
+
+
+
+    // 背景为白色
+    for (int x = 0; x < SCREEN_WIDTH; ++x) {
+        for (int y = 0; y < SCREEN_HEIGHT; ++y) {
+            image[y][x][0] = image[y][x][1] = image[y][x][2] = 1.0f;
         }
     }
 
-    
+
+    //fill();     //第1，2题
+    getDepth();     //第三题
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
