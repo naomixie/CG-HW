@@ -5,3 +5,4 @@
  
  ## Homeworks
  1. [Teapot](https://github.com/naomixie/CG-HW/tree/HW1)
+ 2. [Scanline Algorithm](https://github.com/naomixie/CG-HW/tree/HW2)
