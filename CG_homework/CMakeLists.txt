@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(HW2)
+project(FinalProject)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -25,6 +25,7 @@ include_directories(External/glm-0.9.9.7)
 #add_subdirectory(External/freeglut)
 #include_directories(External/freeglut/include)
 #LIST(APPEND LIBS freeglut)
+
 
 #assimp
 option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
