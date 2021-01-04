@@ -17,8 +17,13 @@ void main()
 {   
     //为了设置顶点着色器的输出，我们必须把位置数据赋值给预定义的gl_Position变量，
     //它在幕后是vec4类型的。在main函数的最后，我们将gl_Position设置的值会成为该顶点着色器的输出。
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-    vPos= gl_Position;
-    FragPos = vec3(model * vec4(aPos,1.0));
-    Normal = aNormal;
+    // gl_Position = projection * view * model * vec4(aPos, 1.0);
+    // vPos= gl_Position;
+    // FragPos = vec3(model * vec4(aPos,1.0));
+    // Normal = aNormal;
+
+    FragPos = vec3(model * vec4(aPos, 1.0));
+    Normal = mat3(transpose(inverse(model))) * aNormal;  
+    
+    gl_Position = projection * view * vec4(FragPos, 1.0);
 }
