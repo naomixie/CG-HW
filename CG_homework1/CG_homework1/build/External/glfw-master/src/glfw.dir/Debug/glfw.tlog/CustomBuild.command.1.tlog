@@ -1,0 +1,10 @@
+^C:\USERS\NAOMI\DESKTOP\CG_HOMEWORK1\CG_HOMEWORK1\EXTERNAL\GLFW-MASTER\SRC\CMAKELISTS.TXT
+setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -SC:/Users/naomi/Desktop/CG_homework1/CG_homework1 -BC:/Users/naomi/Desktop/CG_homework1/CG_homework1/build --check-stamp-file C:/Users/naomi/Desktop/CG_homework1/CG_homework1/build/External/glfw-master/src/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

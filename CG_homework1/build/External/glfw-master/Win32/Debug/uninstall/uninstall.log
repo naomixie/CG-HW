@@ -1,0 +1,6 @@
+﻿  CMake Error at cmake_uninstall.cmake:3 (message):
+    Cannot find install manifest:
+    "C:/Users/naomi/Documents/GitHub/CG-HW/CG_homework1/CG_homework1/build/External/glfw-master/install_manifest.txt"
+  
+  
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(234,5): error MSB6006: "cmd.exe" exited with code 1.

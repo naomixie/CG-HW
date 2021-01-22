@@ -1,0 +1,20 @@
+^C:\USERS\NAOMI\DOCUMENTS\GITHUB\CG-HW\CG_HOMEWORK1\CG_HOMEWORK1\BUILD\CMAKEFILES\0D2E0ECBBAEA2DECE1A2FBFF43081877\UNINSTALL.RULE
+setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -P C:/Users/naomi/Documents/GitHub/CG-HW/CG_homework1/CG_homework1/build/External/glfw-master/cmake_uninstall.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\NAOMI\DOCUMENTS\GITHUB\CG-HW\CG_HOMEWORK1\CG_HOMEWORK1\EXTERNAL\GLFW-MASTER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -SC:/Users/naomi/Documents/GitHub/CG-HW/CG_homework1/CG_homework1 -BC:/Users/naomi/Documents/GitHub/CG-HW/CG_homework1/CG_homework1/build --check-stamp-file C:/Users/naomi/Documents/GitHub/CG-HW/CG_homework1/CG_homework1/build/External/glfw-master/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
