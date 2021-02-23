@@ -6,7 +6,6 @@ layout (location = 2) in vec2 aTexCoords;
 out vec4 vPos;                                  //输出变量，包含4个float分量的默认向量
 out vec3 Normal; //Normal vectors
 out vec3 FragPos;   //Actual Fragment's position   
-out vec2 TexCoord;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -25,6 +24,5 @@ void main()
 
     FragPos = vec3(model * vec4(aPos, 1.0));
     Normal = mat3(transpose(inverse(model))) * aNormal;  
-    TexCoord = aTexCoords;
     gl_Position = projection * view * vec4(FragPos, 1.0);
 }
