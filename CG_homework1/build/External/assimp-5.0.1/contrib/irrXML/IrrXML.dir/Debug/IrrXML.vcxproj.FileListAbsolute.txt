@@ -1,4 +1,0 @@
-C:\Users\naomi\Desktop\CG_homework1\CG_homework1\build\External\assimp-5.0.1\contrib\irrXML\Debug\IrrXML.pdb
-C:\Users\naomi\Desktop\CG_homework1\CG_homework1\build\External\assimp-5.0.1\contrib\irrXML\IrrXML.dir\Debug\IrrXML.pdb
-C:\Users\naomi\Documents\GitHub\CG-HW\CG_homework1\CG_homework1\build\External\assimp-5.0.1\contrib\irrXML\IrrXML.dir\Debug\IrrXML.pdb
-C:\Users\naomi\Documents\GitHub\CG-HW\CG_homework1\CG_homework1\build\External\assimp-5.0.1\contrib\irrXML\Debug\IrrXML.pdb
