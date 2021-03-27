@@ -79,4 +79,55 @@ Bezier 曲线实现参照了原理的公式，想要进入绘画 Bezier 曲线�
 
 ## 颗粒效果
 
+首先是给每一个小的颗粒设计了一个类，如下：
+
+    #define MAX_PARTICLES 100
+    typedef struct //structrue for particle
+    {
+        bool active;      //active or not
+        float life;       //last time
+        float fade;       //describe the decreasing of life
+        float r, g, b;    //color
+        float x, y, z;    //the position
+        float xi, yi, zi; //what direction to move
+        float xg, yg, zg; //gravity
+    } particles;
+
+    particles paticle[MAX_PARTICLES];
+    
+  分别设置了激活时间，是否在激活状态，消亡速度，颜色，位置，移动方向（三维），重力的变量，用来描述每个颗粒的运动状态。项目中设置了颗粒总数为100.
+  
+  设置了一个布尔值来判断是否改生成颗粒效果，它的值与切割是否发生等值，在判断进入了切割模式后再遍历所有的颗粒，如果已经处于激活状态则直接渲染其按照目前的运动状态在这一帧的位置，如果其没有在激活状态则按照目前切割的位置去初始化他的各项数值。
+  
+  这一帧的渲染结果是基于其上一帧的位置，加上移动（三维）的速度去生成的。
+  
+       //Move On The X Axis By X Speed
+       paticle[loop].x += paticle[loop].xi / (slowdown * 1000);
+       //Move On The Y Axis By Y Speed
+       paticle[loop].y += paticle[loop].yi / (slowdown * 1000);
+       //Move On The Z Axis By Z Speed
+       paticle[loop].z += paticle[loop].zi / (slowdown * 1000);
+       
+   而颗粒的存活时间被用作其颜色的alpha值，效果就是剩下的存活时间越短其透明效果越明显
+   
+     glColor4f(paticle[loop].r，
+               paticle[loop].g, 
+               paticle[loop].b,
+               //use life as alpha value, as particle dies,it becomes more and more transparent
+               paticle[loop].life);
+               
+   最后根据每个颗粒不同的消亡速度（在初始化时给了每个颗粒不同的随机的消亡时间）去减少其存活时间，存活时间小于0后将其设为没有被激活，以备下一次渲染重新激活。
+   
+    //decrease particles' life
+    paticle[loop].life -= paticle[loop].fade;
+
+    //if particle is dead,rejuvenate it
+    if (paticle[loop].life < 0.0f)
+    {
+        paticle[loop].active = false;
+    }
+    
 ## 其他
+
+  第一次做这样规模的OpenGL项目，代码还是有很多漏洞的，希望自己以后有时间来优化一下。
+  最后感谢肖老师跟助教们在课程过程中的帮助！
