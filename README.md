@@ -1,4 +1,4 @@
-# CG Homework 2
+# 扫描线算法实现
 
 计算机图形学第二次作业报告，作业环境基于助教提供的第一次作业文件包。
 
@@ -107,11 +107,11 @@ exe 文件全部在/Release 目录下，并且按顺序分别为第一，二，�
 
 由此我们可以得出一下的结论，并且只要对该像素属于的三角形的所有边进行相应的计算，将其结果累加起来便是像素点的 rgb 值。
 
-![r1](https://github.com/naomixie/CG-HW/blob/HW2/CG_homework1/CG_homework1/pics/r1.PNG)
+![r1](https://github.com/naomixie/CG-HW/blob/HW2/CG_homework/pics/r1.PNG)
 
 然而由于点到对边的距离，以及顶点到对边的距离比较难以计算，因此我想到了运用相似三角形的三条边的比值相同的方法，用两个截距的壁纸来替代两个距离的比值进行计算。
 
-![r1](https://github.com/naomixie/CG-HW/blob/HW2/CG_homework1/CG_homework1/pics/r2.PNG)
+![r1](https://github.com/naomixie/CG-HW/blob/HW2/CG_homework/pics/r2.PNG)
 
 由于距离与另一条边与底边（这条边为已知边，计算的是他的对顶点的 rgb 影响）形成两个相似三角形，因此距离值之比就等于两个三角形的两个边之比。用底边的斜率去生成经过像素点与对顶点的两条平行线在 x 上的截距，用边的截距分别减去生成的两个截距，再将其相除得出比值，该比值便是对顶点对于该像素的 rgb 影响的一个比值。
 
@@ -122,7 +122,7 @@ exe 文件全部在/Release 目录下，并且按顺序分别为第一，二，�
 首先观察图像可以发现该图有很高的重复性，其中可以从中间分成四个相同的子区域。
 再进一步观察子区域可以发现它也可以从中间分成四个两两相等的子区域。
 
-![r1](https://github.com/naomixie/CG-HW/blob/HW2/CG_homework1/CG_homework1/pics/r3.PNG)
+![r1](https://github.com/naomixie/CG-HW/blob/HW2/CG_homework/pics/r3.PNG)
 
 由此想到了了使用分治法实现。
 
